@@ -15,7 +15,11 @@ require(tigerstats)
 require(lubridate)
 kRdata <- read.csv(file = 'kRdata.csv')
 ```
+
+
 ### Data is from the Patient_Info dataset from South Korea 1 Jan to 1 May 
+
+
 ### This is contained in a downloadable zip file from kaggle
 
 Some of the data was uncoded for sex - sex must be just male or female
@@ -24,8 +28,9 @@ state of a patient must be died or alive - we adjust that as well
   
 # Question 1 - Is dying independent of sex
 
+$H_0$ = There is no correlation between dying and sex.
 
-
+$H_A$ = Sex is a factor in likeliness of dying. 
 
 Table of patients:
 ```{r}
@@ -36,24 +41,48 @@ with(kRdata, table(Sex, result))
 
 ```
 
+This table suggests that death is related to sex since 25 females died while 44 men died. Men are more prone to death.
+
 ## We create two bar charts - one based on frequency and the other on percent, use ggplot commands to do this
 
-`
+```{r}
+dd2 <- kRdata %>% group_by(Sex, result) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
 
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=Sex,y=count,fill=result))
+basicC + geom_bar(stat="identity",position="dodge")
+
+#Now for percentage plot
+
+basicCC <- ggplot(dd2,aes(x=Sex,y=prcnt*100,fill=result)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
   
-
-
-
-
-
+These graphs show that Males are more likely to die than females. The first graph shows the frequency of deaths for both sexes and the second shows the percentages of dead and alive relative to each sex. Males are much more likely to die than females.
   
 ## Numerical results
 
+```{r}
+table1 <- xtabs(~Sex + result, data=kRdata)
+rowPerc(table1)
+colPerc(table1)
+```
+
+This table shows that Men are indeed more likely to die than women, nearly double as likely.
 
 ## Inferential results 
 
+```{r}
+table1 <- xtabs(~Sex + result, data=kRdata)
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+```
 
-
+the p-value is 9e-04 < .05, so we must reject the null hypothesis.
 
 ## Conclusions
 
+Men in this study are much more likely to die than women. The p-value was much less than .05; therefor we must reject the null hypothesis that there is no correlation between dying and sex.
