@@ -46,17 +46,17 @@ This table suggests that death is related to sex since 25 females died while 44 
 ## We create two bar charts - one based on frequency and the other on percent, use ggplot commands to do this
 
 ```{r}
-dd2 <- kRdata %>% group_by(Sex, result) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+dd2 <- kRdata %>% group_by(result, Sex) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
 
 
 # the group_by followed by summarize(count=n())
 
-basicC <- ggplot(dd2,aes(x=Sex,y=count,fill=result))
+basicC <- ggplot(dd2,aes(x=result,y=count,fill=Sex))
 basicC + geom_bar(stat="identity",position="dodge")
 
 #Now for percentage plot
 
-basicCC <- ggplot(dd2,aes(x=Sex,y=prcnt*100,fill=result)) 
+basicCC <- ggplot(dd2,aes(x=result,y=prcnt*100,fill=Sex)) 
 basicCC + geom_bar(stat="identity", position = "dodge")
 ```
   
@@ -65,7 +65,7 @@ These graphs show that Males are more likely to die than females. The first grap
 ## Numerical results
 
 ```{r}
-table1 <- xtabs(~Sex + result, data=kRdata)
+table1 <- xtabs(~result + Sex, data=kRdata)
 rowPerc(table1)
 colPerc(table1)
 ```
@@ -75,13 +75,13 @@ This table shows that Men are indeed more likely to die than women, nearly doubl
 ## Inferential results 
 
 ```{r}
-table1 <- xtabs(~Sex + result, data=kRdata)
+table1 <- xtabs(~result + Sex, data=kRdata)
 chisq.test(table1)
 chisqtestGC(table1)
 fisher.test(table1)
 ```
 
-the p-value is 9e-04 < .05, so we must reject the null hypothesis.
+The p-value is .001 < .05, so we must reject the null hypothesis. The fisher exact test came up with an odds ratio of 2.3 and a 95% confidence interval of 1.4 to 3.9.
 
 ## Conclusions
 
